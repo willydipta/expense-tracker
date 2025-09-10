@@ -3,58 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pelacak Keuangan</title>
+  <title>Dipta Finance Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
     }
     .input-field {
-      border: 1px solid #d1d5db;
-      background-color: #f9fafb;
-      color: #1f2937;
-      transition: all 0.2s ease-in-out;
+      border: 1px solid #e2e8f0;
+      background-color: #f8fafc;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     }
     .input-field:focus {
-      border-color: #60a5fa;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Toggle slider */
+    .toggle-slider {
+      background-color: #e2e8f0;
+      border-radius: 9999px;
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+    .toggle-slider .slider {
+      position: absolute;
+      top: 0.375rem; /* 6px */
+      bottom: 0.375rem; /* 6px */
+      left: 0.375rem; /* 6px */
+      width: calc(50% - 0.375rem);
       background-color: #ffffff;
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+      border-radius: 9999px;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .toggle-btn {
-      transition: all 0.2s ease-in-out;
+    .toggle-slider span {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #64748b;
+      position: relative;
+      z-index: 10;
+      transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .toggle-btn.active {
-      background-color: #ffffff;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-      color: #2563eb;
+    .toggle-slider span.active {
+      color: #1a202c;
     }
-    .submit-btn {
-      background-color: #2563eb;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+
+    /* Shared button style for consistency */
+    .primary-btn {
+      background: linear-gradient(to right, #06b6d4, #3b82f6);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .submit-btn:hover {
-      background-color: #1d4ed8;
+    .primary-btn:hover {
       transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
     }
+
     .numpad-btn {
-      background-color: #e5e7eb;
-      color: #4b5563;
-      transition: background-color 0.2s ease, transform 0.1s ease;
+      background-color: #f1f5f9;
+      color: #334155;
+      transition: all 0.2s ease;
     }
     .numpad-btn:hover {
-      background-color: #d1d5db;
+      background-color: #e2e8f0;
+      transform: translateY(-1px);
     }
-    .numpad-btn:active {
-      transform: scale(0.95);
-    }
-    .ok-btn {
-      background-color: #2563eb;
-      transition: background-color 0.2s ease;
-    }
-    .ok-btn:hover {
-      background-color: #1d4ed8;
-    }
+    
     .toast {
       animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 2.5s;
     }
@@ -68,47 +92,44 @@
     }
   </style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center p-6 min-h-screen">
+<body class="bg-slate-100 flex items-center justify-center p-6 min-h-screen">
 
-  <div class="card bg-white p-8 rounded-3xl shadow-xl w-full max-w-md">
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Dipta lup Sasa</h2>
+  <div class="card bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm">
+    <h2 class="text-3xl font-bold text-center text-slate-800 mb-8">Dipa Finance Tracker</h2>
     <form id="financeForm" class="space-y-6">
 
-      <!-- Tipe Transaksi -->
+      <!-- Tipe Transaksi (Toggle Slider) -->
       <div>
-        <label class="block text-gray-700 font-semibold mb-3">Tipe</label>
-        <div class="flex items-center space-x-3 bg-gray-200 p-1.5 rounded-2xl">
-          <button type="button" class="toggle-btn flex-1 px-5 py-3 rounded-xl text-base font-semibold text-gray-600 active" data-type="Pemasukan">
-            <i class="fas fa-arrow-down-long mr-2"></i> Pemasukan
-          </button>
-          <button type="button" class="toggle-btn flex-1 px-5 py-3 rounded-xl text-base font-semibold text-gray-600" data-type="Pengeluaran">
-            <i class="fas fa-arrow-up-long mr-2"></i> Pengeluaran
-          </button>
+        <label class="block text-slate-700 font-semibold mb-3">Tipe</label>
+        <div class="toggle-slider flex items-center space-x-2">
+          <div class="slider"></div>
+          <span class="active" data-type="Pemasukan">Pemasukan</span>
+          <span data-type="Pengeluaran">Pengeluaran</span>
         </div>
         <input type="hidden" name="type" id="type" value="Pemasukan">
       </div>
 
       <!-- Tanggal -->
       <div>
-        <label for="date" class="block text-gray-700 font-semibold mb-3">Tanggal</label>
+        <label for="date" class="block text-slate-700 font-semibold mb-3">Tanggal</label>
         <input type="date" id="date" name="date" class="w-full px-5 py-3 rounded-xl input-field" required>
       </div>
 
       <!-- Kategori -->
       <div>
-        <label for="category" class="block text-gray-700 font-semibold mb-3">Kategori</label>
+        <label for="category" class="block text-slate-700 font-semibold mb-3">Kategori</label>
         <select id="category" name="category" class="w-full px-5 py-3 rounded-xl input-field" required></select>
       </div>
 
       <!-- Jumlah -->
       <div>
-        <label for="amount" class="block text-gray-700 font-semibold mb-3">Jumlah (Rp)</label>
+        <label for="amount" class="block text-slate-700 font-semibold mb-3">Jumlah (Rp)</label>
         <input type="text" id="amount" name="amount" class="w-full px-5 py-3 rounded-xl input-field cursor-pointer" readonly required>
       </div>
 
       <!-- Metode -->
       <div>
-        <label for="method" class="block text-gray-700 font-semibold mb-3">Metode</label>
+        <label for="method" class="block text-slate-700 font-semibold mb-3">Metode</label>
         <select name="method" id="method" class="w-full px-5 py-3 rounded-xl input-field">
           <option value="BCA">BCA</option>
           <option value="BRI">BRI</option>
@@ -123,11 +144,11 @@
 
       <!-- Deskripsi -->
       <div>
-        <label for="desc" class="block text-gray-700 font-semibold mb-3">Deskripsi <span class="text-gray-400 font-normal">(opsional)</span></label>
+        <label for="desc" class="block text-slate-700 font-semibold mb-3">Deskripsi <span class="text-slate-400 font-normal">(opsional)</span></label>
         <textarea id="desc" name="desc" class="w-full px-5 py-3 rounded-xl input-field min-h-[90px]" placeholder="Tambahkan catatan"></textarea>
       </div>
 
-      <button class="submit-btn w-full text-white font-bold py-3 rounded-xl shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300" type="submit">
+      <button class="primary-btn w-full text-white font-bold py-3 rounded-xl shadow-md focus:outline-none" type="submit">
         Simpan Transaksi
       </button>
 
@@ -137,7 +158,7 @@
   <!-- Numpad Modal -->
   <div class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 flex items-end justify-center hidden" id="overlay">
     <div class="bg-white p-6 rounded-t-3xl shadow-2xl w-full max-w-sm transform transition-transform duration-300 ease-out translate-y-full" id="numpadModal">
-      <div class="text-right text-3xl font-bold text-gray-800 tracking-wide mb-4 h-10" id="numpadDisplay">0</div>
+      <div class="text-right text-3xl font-bold text-slate-800 tracking-wide mb-4 h-10" id="numpadDisplay">0</div>
       <div class="grid grid-cols-3 gap-3">
         <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">1</button>
         <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">2</button>
@@ -152,8 +173,8 @@
         <button type="button" id="clearBtn" class="numpad-btn text-red-600 bg-red-100 text-2xl font-semibold py-4 rounded-xl"><i class="fas fa-backspace"></i></button>
       </div>
       <div class="flex gap-3 mt-6">
-        <button type="button" id="closeModal" class="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-300 transition-colors duration-200">Tutup</button>
-        <button type="button" id="okBtn" class="flex-1 ok-btn text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors duration-200">OK</button>
+        <button type="button" id="closeModal" class="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl hover:bg-slate-300 transition-colors duration-200">Tutup</button>
+        <button type="button" id="okBtn" class="flex-1 primary-btn text-white font-bold py-3 rounded-xl">OK</button>
       </div>
     </div>
   </div>
@@ -173,7 +194,9 @@
     const overlay = document.getElementById('overlay');
     const toast = document.getElementById('toast');
     const typeInput = document.getElementById('type');
-    const typeButtons = document.querySelectorAll('.toggle-btn');
+    const toggleSlider = document.querySelector('.toggle-slider');
+    const slider = document.querySelector('.toggle-slider .slider');
+    const toggleOptions = toggleSlider.querySelectorAll('span');
     const categorySelect = document.getElementById('category');
     const numpadDisplay = document.getElementById('numpadDisplay');
     const financeForm = document.getElementById('financeForm');
@@ -199,17 +222,44 @@
         return num.toLocaleString('id-ID');
     }
 
-    typeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        typeButtons.forEach(b => {
-          b.classList.remove('active');
-        });
-        btn.classList.add('active');
-        typeInput.value = btn.dataset.type;
-        updateCategories(btn.dataset.type);
+    // Handle both click and swipe for the toggle slider
+    let startX = 0;
+    const swipeThreshold = 50; // pixels
+
+    toggleOptions.forEach((opt, index) => {
+      opt.addEventListener('click', () => {
+        updateToggle(index);
       });
     });
 
+    toggleSlider.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+
+    toggleSlider.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].clientX;
+      const swipeDistance = endX - startX;
+
+      // Only act on a significant horizontal swipe
+      if (Math.abs(swipeDistance) > swipeThreshold) {
+        if (swipeDistance > 0) {
+          // Swiped right -> select 'Pengeluaran'
+          updateToggle(1);
+        } else {
+          // Swiped left -> select 'Pemasukan'
+          updateToggle(0);
+        }
+      }
+    });
+
+    function updateToggle(index) {
+        toggleOptions.forEach(o => o.classList.remove('active'));
+        toggleOptions[index].classList.add('active');
+        typeInput.value = toggleOptions[index].dataset.type;
+        slider.style.left = index === 0 ? '0.375rem' : 'calc(50% - 0.375rem)';
+        updateCategories(typeInput.value);
+    }
+    
     updateCategories(typeInput.value);
 
     amountInput.addEventListener('click', () => {
@@ -225,7 +275,7 @@
           currentValue += btn.textContent;
         }
         amountInput.dataset.value = currentValue.replace(/^0+/, ''); // remove leading zeros
-        numpadDisplay.textContent = formatNumber(amountInput.dataset.value);
+        numpadDisplay.textContent = formatNumber(currentValue);
       });
     });
 
@@ -269,11 +319,7 @@
         e.target.reset();
         amountInput.value = '';
         amountInput.dataset.value = '';
-        typeButtons.forEach(b => {
-          b.classList.remove('active');
-        });
-        typeButtons[0].classList.add('active');
-        updateCategories(typeInput.value);
+        updateToggle(0); // Reset to 'Pemasukan' after successful submit
       })
       .catch(err => {
         console.error("Error:", err);
