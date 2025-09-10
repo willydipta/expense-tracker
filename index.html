@@ -1,58 +1,315 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Catatan Keuangan</title>
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      background: #f5f7fa;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      margin: 0;
-      padding: 40px 20px;
-    }
-    .form-wrapper {
-      width: 100%;
-      max-width: 480px;
-      background: #fff;
-      border-radius: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      overflow: hidden;
-      transition: transform 0.2s ease-in-out;
-    }
-    .form-wrapper:hover {
-      transform: translateY(-4px);
-    }
-    header {
-      background: #ff7a59;
-      color: #fff;
-      text-align: center;
       padding: 20px;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.5rem;
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    h2 {
+      margin-bottom: 16px;
+      color: #1e293b;
+    }
+    .toggle-group {
+      display: flex;
+      margin-bottom: 20px;
+      gap: 10px;
+      background: #f1f5f9;
+      padding: 6px;
+      border-radius: 12px;
+    }
+    .toggle-group button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #475569;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .toggle-group .active {
+      background: #2563eb;
+      color: #fff;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    input, select, textarea {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border 0.2s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border: 1px solid #2563eb;
+    }
+    button.submit {
+      margin-top: 28px;
+      width: 100%;
+      padding: 14px;
+      background: #2563eb;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button.submit:hover {
+      background: #1d4ed8;
+    }
+    /* Overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+    /* Numpad Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
+      padding: 20px;
+      animation: slideUp 0.3s ease;
+      z-index: 1000;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .numpad button {
+      padding: 18px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      background: #e2e8f0;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .numpad button:hover {
+      background: #cbd5e1;
+    }
+    .close-modal, .ok-btn {
+      text-align: center;
+      margin-top: 12px;
+      color: #2563eb;
+      cursor: pointer;
       font-weight: 600;
     }
-    iframe {
-      width: 100%;
-      height: 85vh;
-      border: none;
+    .ok-btn {
+      background: #2563eb;
+      color: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 16px;
     }
+    /* Toast */
+    .toast {
+      visibility: hidden;
+      min-width: 200px;
+      background: #16a34a;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1100;
+    }
+    .toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein { from {opacity: 0;} to {opacity: 1;} }
+    @keyframes fadeout { from {opacity: 1;} to {opacity: 0;} }
   </style>
 </head>
 <body>
-  <div class="form-wrapper">
-    <header>
-      <h1>💸 Catatan Keuangan</h1>
-    </header>
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdbaFsf4nUgw4TSu29nK5aqYcTQPtw0-8vFYEp67NeNlzkjEQ/viewform?embedded=true" allowfullscreen>Loading…</iframe>
+  <div class="card">
+    <h2>Tambah Transaksi Baru</h2>
+    <div class="toggle-group">
+      <button class="active" id="incBtn">Pemasukan</button>
+      <button id="expBtn">Pengeluaran</button>
+    </div>
+    <form id="financeForm">
+      <input type="hidden" name="type" id="type" value="Pemasukan">
+      <label for="date">Tanggal</label>
+      <input type="date" id="date" name="date" required>
+      <label for="category">Kategori</label>
+      <select id="category" name="category" required></select>
+      <label for="amount">Jumlah (Rp)</label>
+      <input type="text" id="amount" name="amount" readonly required>
+      <label for="method">Metode Pembayaran</label>
+      <select id="method" name="method" required>
+        <option value="Cash">Cash</option>
+        <option value="Transfer">Transfer</option>
+        <option value="E-wallet">E-wallet</option>
+      </select>
+      <label for="desc">Deskripsi (opsional)</label>
+      <textarea id="desc" name="desc" rows="3"></textarea>
+      <button class="submit" type="submit">Kirim</button>
+    </form>
   </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Modal Numpad -->
+  <div class="modal" id="numpadModal">
+    <div class="numpad">
+      <button type="button" aria-label="angka 1">1</button>
+      <button type="button" aria-label="angka 2">2</button>
+      <button type="button" aria-label="angka 3">3</button>
+      <button type="button" aria-label="angka 4">4</button>
+      <button type="button" aria-label="angka 5">5</button>
+      <button type="button" aria-label="angka 6">6</button>
+      <button type="button" aria-label="angka 7">7</button>
+      <button type="button" aria-label="angka 8">8</button>
+      <button type="button" aria-label="angka 9">9</button>
+      <button type="button" aria-label="angka 0">0</button>
+      <button type="button" id="clear" aria-label="hapus">⌫</button>
+    </div>
+    <div class="ok-btn" id="okBtn">OK</div>
+    <div class="close-modal" id="closeModal">Tutup</div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Data berhasil disimpan!</div>
+
+  <script>
+    const incBtn = document.getElementById('incBtn');
+    const expBtn = document.getElementById('expBtn');
+    const typeInput = document.getElementById('type');
+    const category = document.getElementById('category');
+    const amountInput = document.getElementById('amount');
+    const numpadModal = document.getElementById('numpadModal');
+    const numpadButtons = numpadModal.querySelectorAll('.numpad button');
+    const closeModal = document.getElementById('closeModal');
+    const okBtn = document.getElementById('okBtn');
+    const overlay = document.getElementById('overlay');
+    const toast = document.getElementById('toast');
+
+    const incomeCats = ['💼 Gaji', '🎨 Freelance', '📈 Investasi', '🏦 Dividen', '🎁 Hadiah'];
+    const expenseCats = ['🍔 Makanan', '🚗 Transportasi', '🎬 Hiburan', '💊 Kesehatan', '🏠 Rumah Tangga'];
+
+    function populateCats(list) {
+      category.innerHTML = '';
+      list.forEach(x => {
+        const opt = document.createElement('option');
+        opt.value = x;
+        opt.textContent = x;
+        category.appendChild(opt);
+      });
+    }
+
+    populateCats(incomeCats);
+
+    incBtn.addEventListener('click', () => {
+      typeInput.value = 'Pemasukan';
+      incBtn.classList.add('active');
+      expBtn.classList.remove('active');
+      populateCats(incomeCats);
+    });
+
+    expBtn.addEventListener('click', () => {
+      typeInput.value = 'Pengeluaran';
+      expBtn.classList.add('active');
+      incBtn.classList.remove('active');
+      populateCats(expenseCats);
+    });
+
+    amountInput.addEventListener('click', () => {
+      numpadModal.style.display = 'block';
+      overlay.style.display = 'block';
+    });
+
+    numpadButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(btn.id === 'clear') {
+          amountInput.value = amountInput.value.slice(0, -1);
+        } else {
+          amountInput.value += btn.textContent;
+        }
+        formatAmount();
+      });
+    });
+
+    function formatAmount() {
+      let raw = amountInput.value.replace(/\D/g, '');
+      if(!raw) { amountInput.value = ''; return; }
+      amountInput.value = parseInt(raw).toLocaleString('id-ID');
+    }
+
+    okBtn.addEventListener('click', () => {
+      numpadModal.style.display = 'none';
+      overlay.style.display = 'none';
+    });
+
+    closeModal.addEventListener('click', () => {
+      numpadModal.style.display = 'none';
+      overlay.style.display = 'none';
+    });
+
+    document.getElementById('financeForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target));
+
+      fetch('https://script.google.com/macros/s/AKfycbx1ZQa-3cjo3AdXmhgpc6pNlk8Ofv1lau_i-sP33LDXxEIVQVOxqHbaRQ-BRdCBxUNDlQ/exec', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+        e.target.reset();
+        amountInput.value = '';
+        incBtn.click();
+      })
+      .catch(err => alert('Error: ' + err));
+    });
+  </script>
 </body>
 </html>
