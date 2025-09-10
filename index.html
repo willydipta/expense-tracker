@@ -2,6 +2,291 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pelacak Keuangan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .input-field {
+      border: 1px solid #d1d5db;
+      background-color: #f9fafb;
+      color: #1f2937;
+      transition: all 0.2s ease-in-out;
+    }
+    .input-field:focus {
+      border-color: #60a5fa;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+    }
+    .toggle-btn {
+      transition: all 0.2s ease-in-out;
+    }
+    .toggle-btn.active {
+      background-color: #ffffff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      color: #2563eb;
+    }
+    .submit-btn {
+      background-color: #2563eb;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .submit-btn:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-2px);
+    }
+    .numpad-btn {
+      background-color: #e5e7eb;
+      color: #4b5563;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .numpad-btn:hover {
+      background-color: #d1d5db;
+    }
+    .numpad-btn:active {
+      transform: scale(0.95);
+    }
+    .ok-btn {
+      background-color: #2563eb;
+      transition: background-color 0.2s ease;
+    }
+    .ok-btn:hover {
+      background-color: #1d4ed8;
+    }
+    .toast {
+      animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 2.5s;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center p-6 min-h-screen">
+
+  <div class="card bg-white p-8 rounded-3xl shadow-xl w-full max-w-md">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Dipta sayangmu</h2>
+    <form id="financeForm" class="space-y-6">
+
+      <!-- Tipe Transaksi -->
+      <div>
+        <label class="block text-gray-700 font-semibold mb-3">Tipe</label>
+        <div class="flex items-center space-x-3 bg-gray-200 p-1.5 rounded-2xl">
+          <button type="button" class="toggle-btn flex-1 px-5 py-3 rounded-xl text-base font-semibold text-gray-600 active" data-type="Pemasukan">
+            <i class="fas fa-arrow-down-long mr-2"></i> Pemasukan
+          </button>
+          <button type="button" class="toggle-btn flex-1 px-5 py-3 rounded-xl text-base font-semibold text-gray-600" data-type="Pengeluaran">
+            <i class="fas fa-arrow-up-long mr-2"></i> Pengeluaran
+          </button>
+        </div>
+        <input type="hidden" name="type" id="type" value="Pemasukan">
+      </div>
+
+      <!-- Tanggal -->
+      <div>
+        <label for="date" class="block text-gray-700 font-semibold mb-3">Tanggal</label>
+        <input type="date" id="date" name="date" class="w-full px-5 py-3 rounded-xl input-field" required>
+      </div>
+
+      <!-- Kategori -->
+      <div>
+        <label for="category" class="block text-gray-700 font-semibold mb-3">Kategori</label>
+        <select id="category" name="category" class="w-full px-5 py-3 rounded-xl input-field" required></select>
+      </div>
+
+      <!-- Jumlah -->
+      <div>
+        <label for="amount" class="block text-gray-700 font-semibold mb-3">Jumlah (Rp)</label>
+        <input type="text" id="amount" name="amount" class="w-full px-5 py-3 rounded-xl input-field cursor-pointer" readonly required>
+      </div>
+
+      <!-- Metode -->
+      <div>
+        <label for="method" class="block text-gray-700 font-semibold mb-3">Metode</label>
+        <select name="method" id="method" class="w-full px-5 py-3 rounded-xl input-field">
+          <option value="BCA">BCA</option>
+          <option value="BRI">BRI</option>
+          <option value="BNI">BNI</option>
+          <option value="Jago">Jago</option>
+          <option value="ShopeePay">ShopeePay</option>
+          <option value="GoPay">GoPay</option>
+          <option value="Dana">Dana</option>
+          <option value="Cash">Cash</option>
+        </select>
+      </div>
+
+      <!-- Deskripsi -->
+      <div>
+        <label for="desc" class="block text-gray-700 font-semibold mb-3">Deskripsi <span class="text-gray-400 font-normal">(opsional)</span></label>
+        <textarea id="desc" name="desc" class="w-full px-5 py-3 rounded-xl input-field min-h-[90px]" placeholder="Tambahkan catatan"></textarea>
+      </div>
+
+      <button class="submit-btn w-full text-white font-bold py-3 rounded-xl shadow-md focus:outline-none focus:ring-4 focus:ring-blue-300" type="submit">
+        Simpan Transaksi
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Numpad Modal -->
+  <div class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 flex items-end justify-center hidden" id="overlay">
+    <div class="bg-white p-6 rounded-t-3xl shadow-2xl w-full max-w-sm transform transition-transform duration-300 ease-out translate-y-full" id="numpadModal">
+      <div class="text-right text-3xl font-bold text-gray-800 tracking-wide mb-4 h-10" id="numpadDisplay">0</div>
+      <div class="grid grid-cols-3 gap-3">
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">1</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">2</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">3</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">4</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">5</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">6</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">7</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">8</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">9</button>
+        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl col-span-2">0</button>
+        <button type="button" id="clearBtn" class="numpad-btn text-red-600 bg-red-100 text-2xl font-semibold py-4 rounded-xl"><i class="fas fa-backspace"></i></button>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button type="button" id="closeModal" class="flex-1 bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-300 transition-colors duration-200">Tutup</button>
+        <button type="button" id="okBtn" class="flex-1 ok-btn text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors duration-200">OK</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Message -->
+  <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-lg font-semibold text-sm transform-gpu transition-all duration-300 ease-in-out opacity-0 z-50">
+    <i class="fas fa-check-circle mr-2"></i> Data berhasil disimpan!
+  </div>
+
+  <script>
+    const amountInput = document.getElementById('amount');
+    const numpadModal = document.getElementById('numpadModal');
+    const numpadButtons = document.querySelectorAll('.numpad-btn');
+    const clearBtn = document.getElementById('clearBtn');
+    const closeModal = document.getElementById('closeModal');
+    const okBtn = document.getElementById('okBtn');
+    const overlay = document.getElementById('overlay');
+    const toast = document.getElementById('toast');
+    const typeInput = document.getElementById('type');
+    const typeButtons = document.querySelectorAll('.toggle-btn');
+    const categorySelect = document.getElementById('category');
+    const numpadDisplay = document.getElementById('numpadDisplay');
+    const financeForm = document.getElementById('financeForm');
+
+    const categories = {
+      Pemasukan: ["Gaji", "Freelance", "Investasi", "Lainnya"],
+      Pengeluaran: ["Makanan", "Transportasi", "Belanja", "Tagihan", "Hiburan", "Lainnya"]
+    };
+
+    function updateCategories(type) {
+      categorySelect.innerHTML = '';
+      categories[type].forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
+    }
+    
+    function formatNumber(numStr) {
+        if (!numStr) return '0';
+        const num = parseInt(numStr.replace(/\D/g, ''), 10);
+        return num.toLocaleString('id-ID');
+    }
+
+    typeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        typeButtons.forEach(b => {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        typeInput.value = btn.dataset.type;
+        updateCategories(btn.dataset.type);
+      });
+    });
+
+    updateCategories(typeInput.value);
+
+    amountInput.addEventListener('click', () => {
+      overlay.classList.remove('hidden');
+      numpadModal.classList.remove('translate-y-full');
+      numpadDisplay.textContent = formatNumber(amountInput.dataset.value || '');
+    });
+
+    numpadButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        let currentValue = amountInput.dataset.value || '';
+        if (btn.textContent.match(/[0-9]/)) {
+          currentValue += btn.textContent;
+        }
+        amountInput.dataset.value = currentValue.replace(/^0+/, ''); // remove leading zeros
+        numpadDisplay.textContent = formatNumber(amountInput.dataset.value);
+      });
+    });
+
+    clearBtn.addEventListener('click', () => {
+      let currentValue = amountInput.dataset.value || '';
+      amountInput.dataset.value = currentValue.slice(0, -1);
+      numpadDisplay.textContent = formatNumber(amountInput.dataset.value);
+    });
+
+    okBtn.addEventListener('click', () => {
+      amountInput.value = 'Rp ' + formatNumber(amountInput.dataset.value);
+      overlay.classList.add('hidden');
+      numpadModal.classList.add('translate-y-full');
+    });
+
+    closeModal.addEventListener('click', () => {
+      overlay.classList.add('hidden');
+      numpadModal.classList.add('translate-y-full');
+    });
+
+    financeForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const amountValue = amountInput.dataset.value;
+      if (amountValue) {
+        formData.set('amount', amountValue);
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbzAH1ygE-bSJMVnnPmEQGQygpO1gs4juPmC3OeUSouAXevWhAb2wdq66czKDdhCP9Xeug/exec", {
+        method: "POST",
+        body: new URLSearchParams(formData),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      })
+      .then(res => res.json())
+      .then(data => {
+        toast.classList.remove('opacity-0');
+        setTimeout(() => {
+          toast.classList.add('opacity-0');
+        }, 3000);
+        
+        e.target.reset();
+        amountInput.value = '';
+        amountInput.dataset.value = '';
+        typeButtons.forEach(b => {
+          b.classList.remove('active');
+        });
+        typeButtons[0].classList.add('active');
+        updateCategories(typeInput.value);
+      })
+      .catch(err => {
+        console.error("Error:", err);
+      });
+    });
+
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Finance Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
