@@ -4,49 +4,151 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Finance Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; background: #f5f7fa; display:flex; justify-content:center; padding:20px; }
-    .card { background:#fff; padding:20px; border-radius:12px; width:100%; max-width:400px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    label { display:block; margin-top:10px; font-weight:bold; }
-    input, select, textarea { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:8px; }
-    button { margin-top:20px; width:100%; padding:12px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer; }
+    body { font-family: 'Poppins', sans-serif; background: #f5f7fa; display:flex; justify-content:center; padding:20px; }
+    .card { background:#fff; padding:28px; border-radius:20px; width:100%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,0.1); }
+    h2 { text-align:center; margin-bottom:20px; color:#111827; }
+    label { display:block; margin-top:14px; font-weight:600; color:#374151; }
+    input, select, textarea { width:100%; box-sizing:border-box; padding:14px; margin-top:6px; border:1px solid #d1d5db; border-radius:12px; font-size:1rem; transition:border .2s ease; display:block; }
+    input:focus, select:focus, textarea:focus { outline:none; border:1px solid #2563eb; }
+    textarea { resize:vertical; min-height:80px; }
+    .toggle-group { display:flex; gap:10px; margin-top:10px; }
+    .toggle { flex:1; padding:12px; text-align:center; border-radius:12px; cursor:pointer; background:#e5e7eb; font-weight:600; transition:all .2s ease; }
+    .toggle.active { background:#2563eb; color:#fff; }
+    button.submit { margin-top:28px; width:100%; padding:14px; background:#2563eb; color:#fff; border:none; border-radius:14px; font-weight:600; font-size:1.1rem; cursor:pointer; transition:background .2s ease; }
+    button.submit:hover { background:#1d4ed8; }
+    /* numpad modal */
+    .overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); z-index:999; }
+    .modal { display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top-left-radius:20px; border-top-right-radius:20px; padding:20px; box-shadow:0 -4px 16px rgba(0,0,0,0.2); z-index:1000; animation:slideUp .3s ease; }
+    @keyframes slideUp { from { transform:translateY(100%);} to { transform:translateY(0);} }
+    .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
+    .numpad button { padding:20px; font-size:1.2rem; border:none; border-radius:12px; background:#e5e7eb; cursor:pointer; transition:background .2s ease; }
+    .numpad button:hover { background:#d1d5db; }
+    .ok-btn { margin-top:16px; padding:12px; text-align:center; border-radius:12px; background:#2563eb; color:#fff; cursor:pointer; font-weight:600; }
+    .close-modal { margin-top:10px; text-align:center; color:#6b7280; cursor:pointer; }
+    /* toast */
+    .toast { visibility:hidden; min-width:200px; background:#16a34a; color:#fff; text-align:center; border-radius:10px; padding:14px; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:1100; }
+    .toast.show { visibility:visible; animation:fadein .5s, fadeout .5s 2.5s; }
+    @keyframes fadein { from{opacity:0;} to{opacity:1;} } @keyframes fadeout { from{opacity:1;} to{opacity:0;} }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Tambah Transaksi</h2>
+    <h2>Dipta Finance Tracker</h2>
     <form id="financeForm">
-      <label for="type">Tipe</label>
-      <select name="type" id="type">
-        <option value="Pemasukan">Pemasukan</option>
-        <option value="Pengeluaran">Pengeluaran</option>
-      </select>
+      <label>Tipe</label>
+      <div class="toggle-group">
+        <div class="toggle active" data-value="Pemasukan">Pemasukan</div>
+        <div class="toggle" data-value="Pengeluaran">Pengeluaran</div>
+      </div>
+      <input type="hidden" name="type" id="type" value="Pemasukan">
 
       <label for="date">Tanggal</label>
       <input type="date" id="date" name="date" required>
 
       <label for="category">Kategori</label>
-      <input type="text" id="category" name="category" required>
+      <select id="category" name="category" required></select>
 
       <label for="amount">Jumlah (Rp)</label>
-      <input type="number" id="amount" name="amount" required>
+      <input type="text" id="amount" name="amount" readonly required>
 
       <label for="method">Metode</label>
       <select name="method" id="method">
+        <option value="BCA">BCA</option>
+        <option value="BRI">BRI</option>
+        <option value="BNI">BNI</option>
+        <option value="Jago">Jago</option>
+        <option value="ShopeePay">ShopeePay</option>
+        <option value="GoPay">GoPay</option>
+        <option value="Dana">Dana</option>
         <option value="Cash">Cash</option>
-        <option value="Transfer">Transfer</option>
-        <option value="E-wallet">E-wallet</option>
       </select>
 
       <label for="desc">Deskripsi</label>
       <textarea id="desc" name="desc"></textarea>
 
-      <button type="submit">Simpan</button>
+      <button class="submit" type="submit">Simpan</button>
     </form>
-    <p id="msg"></p>
   </div>
 
+  <div class="overlay" id="overlay"></div>
+  <div class="modal" id="numpadModal">
+    <div class="numpad">
+      <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+      <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+      <button type="button">7</button><button type="button">8</button><button type="button">9</button>
+      <button type="button">0</button><button type="button" id="clear">⌫</button>
+    </div>
+    <div class="ok-btn" id="okBtn">OK</div>
+    <div class="close-modal" id="closeModal">Tutup</div>
+  </div>
+
+  <div class="toast" id="toast">✅ Data tersimpan!</div>
+
   <script>
+    const amountInput = document.getElementById('amount');
+    const numpadModal = document.getElementById('numpadModal');
+    const numpadButtons = numpadModal.querySelectorAll('.numpad button');
+    const closeModal = document.getElementById('closeModal');
+    const okBtn = document.getElementById('okBtn');
+    const overlay = document.getElementById('overlay');
+    const toast = document.getElementById('toast');
+    const typeInput = document.getElementById('type');
+    const toggles = document.querySelectorAll('.toggle');
+    const categorySelect = document.getElementById('category');
+
+    const categories = {
+      Pemasukan: ["Gaji", "Freelance", "Investasi", "Lainnya"],
+      Pengeluaran: ["Makanan", "Transportasi", "Belanja", "Tagihan", "Hiburan", "Lainnya"]
+    };
+
+    function updateCategories(type) {
+      categorySelect.innerHTML = '';
+      categories[type].forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    toggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        toggles.forEach(t => t.classList.remove('active'));
+        toggle.classList.add('active');
+        typeInput.value = toggle.dataset.value;
+        updateCategories(toggle.dataset.value);
+      });
+    });
+
+    updateCategories(typeInput.value);
+
+    amountInput.addEventListener('click', () => {
+      numpadModal.style.display = 'block';
+      overlay.style.display = 'block';
+    });
+
+    numpadButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(btn.id === 'clear') {
+          amountInput.value = amountInput.value.slice(0, -1);
+        } else {
+          amountInput.value += btn.textContent;
+        }
+      });
+    });
+
+    okBtn.addEventListener('click', () => {
+      numpadModal.style.display = 'none';
+      overlay.style.display = 'none';
+    });
+
+    closeModal.addEventListener('click', () => {
+      numpadModal.style.display = 'none';
+      overlay.style.display = 'none';
+    });
+
     document.getElementById('financeForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -58,12 +160,13 @@
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById('msg').textContent = "✅ Data tersimpan!";
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
         e.target.reset();
+        amountInput.value = '';
+        updateCategories(typeInput.value);
       })
-      .catch(err => {
-        document.getElementById('msg').textContent = "❌ Error: " + err;
-      });
+      .catch(err => alert("❌ Error: " + err));
     });
   </script>
 </body>
