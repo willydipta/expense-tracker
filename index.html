@@ -2,31 +2,67 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Dipta Finance Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-    }
-    .input-field {
-      border: 1px solid #e2e8f0;
       background-color: #f8fafc;
-      transition: all 0.3s ease;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-    }
-    .input-field:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+      transition: background-color 0.3s ease;
+      touch-action: manipulation;
     }
 
-    /* Toggle slider */
+    .form-card {
+      background-color: #ffffff;
+      padding: 2rem 1.5rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    .input-group {
+      margin-top: 1.25rem;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      background-color: #f1f5f9;
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      transition: all 0.2s ease;
+      border: 1px solid #e2e8f0;
+      color: #1a202c;
+      font-weight: 400;
+    }
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background-color: #ffffff;
+    }
+    .input-group select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.25rem;
+    }
+    
     .toggle-slider {
-      background-color: #e2e8f0;
+      background-color: #f1f5f9;
       border-radius: 9999px;
       position: relative;
       overflow: hidden;
@@ -35,19 +71,20 @@
     }
     .toggle-slider .slider {
       position: absolute;
-      top: 0.375rem; /* 6px */
-      bottom: 0.375rem; /* 6px */
-      left: 0.375rem; /* 6px */
-      width: calc(50% - 0.375rem);
-      background-color: #ffffff;
+      top: 0.25rem;
+      bottom: 0.25rem;
+      left: 0.25rem;
+      width: calc(50% - 0.25rem);
+      background: linear-gradient(to right, #0ea5e9, #3b82f6);
       border-radius: 9999px;
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      touch-action: none;
     }
     .toggle-slider span {
       flex: 1;
       text-align: center;
-      padding: 0.75rem 1.25rem;
+      padding: 0.75rem 1rem;
       font-weight: 600;
       cursor: pointer;
       color: #64748b;
@@ -56,19 +93,22 @@
       transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .toggle-slider span.active {
-      color: #1a202c;
+      color: #ffffff;
     }
 
-    /* Shared button style for consistency */
     .primary-btn {
-      background: linear-gradient(to right, #06b6d4, #3b82f6);
+      background: linear-gradient(to right, #0ea5e9, #3b82f6);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
     }
-
+    .primary-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+    }
+    
     .numpad-btn {
       background-color: #f1f5f9;
       color: #334155;
@@ -78,7 +118,10 @@
       background-color: #e2e8f0;
       transform: translateY(-1px);
     }
-    
+    .numpad-btn:active {
+      transform: translateY(1px);
+    }
+
     .toast {
       animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 2.5s;
     }
@@ -92,67 +135,75 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center p-6 min-h-screen">
+<body class="flex items-center justify-center min-h-screen p-4">
+  <div class="w-full max-w-sm">
 
-  <div class="card bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm">
-    <h2 class="text-3xl font-bold text-center text-slate-800 mb-8">Dipa Finance Tracker</h2>
-    <form id="financeForm" class="space-y-6">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-slate-900">Dipta Finance Tracker</h1>
+      <p class="text-sm text-slate-500 font-normal mt-1">Tambah Transaksi Baru</p>
+    </header>
 
-      <!-- Tipe Transaksi (Toggle Slider) -->
-      <div>
-        <label class="block text-slate-700 font-semibold mb-3">Tipe</label>
-        <div class="toggle-slider flex items-center space-x-2">
-          <div class="slider"></div>
-          <span class="active" data-type="Pemasukan">Pemasukan</span>
-          <span data-type="Pengeluaran">Pengeluaran</span>
+    <div class="form-card">
+      <form id="financeForm">
+        
+        <!-- Tipe Transaksi (Toggle Slider) -->
+        <div class="mb-4">
+          <label class="block text-slate-700 font-semibold mb-2">Tipe Transaksi</label>
+          <div class="toggle-slider flex items-center justify-between p-1">
+            <div class="slider" id="slider"></div>
+            <span class="flex-1 text-center py-2 relative z-10 font-medium" data-type="Pemasukan">Pemasukan</span>
+            <span class="flex-1 text-center py-2 relative z-10 font-medium" data-type="Pengeluaran">Pengeluaran</span>
+          </div>
+          <input type="hidden" name="type" id="type" value="Pemasukan">
         </div>
-        <input type="hidden" name="type" id="type" value="Pemasukan">
-      </div>
 
-      <!-- Tanggal -->
-      <div>
-        <label for="date" class="block text-slate-700 font-semibold mb-3">Tanggal</label>
-        <input type="date" id="date" name="date" class="w-full px-5 py-3 rounded-xl input-field" required>
-      </div>
+        <!-- Tanggal -->
+        <div class="input-group">
+          <label for="date">Tanggal</label>
+          <input type="date" id="date" name="date" class="bg-transparent outline-none text-slate-800 font-medium" placeholder=" " required>
+        </div>
 
-      <!-- Kategori -->
-      <div>
-        <label for="category" class="block text-slate-700 font-semibold mb-3">Kategori</label>
-        <select id="category" name="category" class="w-full px-5 py-3 rounded-xl input-field" required></select>
-      </div>
+        <!-- Kategori -->
+        <div class="input-group">
+          <label for="category">Kategori</label>
+          <select id="category" name="category" class="bg-transparent outline-none text-slate-800 font-medium" required>
+            <!-- Opsi akan diisi oleh JavaScript -->
+          </select>
+        </div>
 
-      <!-- Jumlah -->
-      <div>
-        <label for="amount" class="block text-slate-700 font-semibold mb-3">Jumlah (Rp)</label>
-        <input type="text" id="amount" name="amount" class="w-full px-5 py-3 rounded-xl input-field cursor-pointer" readonly required>
-      </div>
+        <!-- Jumlah -->
+        <div class="input-group cursor-pointer" id="amountCard">
+          <label for="amount">Jumlah (Rp)</label>
+          <input type="text" id="amount" name="amount" class="bg-transparent outline-none text-slate-800 font-semibold text-xl" placeholder="0" readonly required>
+        </div>
 
-      <!-- Metode -->
-      <div>
-        <label for="method" class="block text-slate-700 font-semibold mb-3">Metode</label>
-        <select name="method" id="method" class="w-full px-5 py-3 rounded-xl input-field">
-          <option value="BCA">BCA</option>
-          <option value="BRI">BRI</option>
-          <option value="BNI">BNI</option>
-          <option value="Jago">Jago</option>
-          <option value="ShopeePay">ShopeePay</option>
-          <option value="GoPay">GoPay</option>
-          <option value="Dana">Dana</option>
-          <option value="Cash">Cash</option>
-        </select>
-      </div>
+        <!-- Metode -->
+        <div class="input-group">
+          <label for="method">Metode</label>
+          <select name="method" id="method" class="bg-transparent outline-none text-slate-800 font-medium">
+            <option value="BCA">BCA</option>
+            <option value="BRI">BRI</option>
+            <option value="BNI">BNI</option>
+            <option value="Jago">Jago</option>
+            <option value="ShopeePay">ShopeePay</option>
+            <option value="GoPay">GoPay</option>
+            <option value="Dana">Dana</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
 
-      <!-- Deskripsi -->
-      <div>
-        <label for="desc" class="block text-slate-700 font-semibold mb-3">Deskripsi <span class="text-slate-400 font-normal">(opsional)</span></label>
-        <textarea id="desc" name="desc" class="w-full px-5 py-3 rounded-xl input-field min-h-[90px]" placeholder="Tambahkan catatan"></textarea>
-      </div>
+        <!-- Deskripsi -->
+        <div class="input-group">
+          <label for="desc">Deskripsi</label>
+          <textarea id="desc" name="desc" class="bg-transparent outline-none text-slate-800 font-medium min-h-[90px]" placeholder="Tambahkan catatan"></textarea>
+        </div>
 
-      <button class="primary-btn w-full text-white font-bold py-3 rounded-xl shadow-md focus:outline-none" type="submit">
-        Simpan Transaksi
-      </button>
-
-    </form>
+        <button class="primary-btn w-full text-white font-bold py-3 mt-6 rounded-xl shadow-md focus:outline-none" type="submit">
+          Simpan Transaksi
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- Numpad Modal -->
@@ -185,6 +236,7 @@
   </div>
 
   <script>
+    const amountCard = document.getElementById('amountCard');
     const amountInput = document.getElementById('amount');
     const numpadModal = document.getElementById('numpadModal');
     const numpadButtons = document.querySelectorAll('.numpad-btn');
@@ -195,7 +247,7 @@
     const toast = document.getElementById('toast');
     const typeInput = document.getElementById('type');
     const toggleSlider = document.querySelector('.toggle-slider');
-    const slider = document.querySelector('.toggle-slider .slider');
+    const slider = document.getElementById('slider');
     const toggleOptions = toggleSlider.querySelectorAll('span');
     const categorySelect = document.getElementById('category');
     const numpadDisplay = document.getElementById('numpadDisplay');
@@ -222,47 +274,125 @@
         return num.toLocaleString('id-ID');
     }
 
-    // Handle both click and swipe for the toggle slider
-    let startX = 0;
-    const swipeThreshold = 50; // pixels
+    // Toggle Slider Logic (for both mouse and touch)
+    let isDragging = false;
+    let dragStartX = 0;
+    let sliderOffset = 0;
+    let toggleSliderWidth = 0;
+    let sliderWidth = 0;
+    
+    window.addEventListener('resize', () => {
+      toggleSliderWidth = toggleSlider.offsetWidth;
+      sliderWidth = slider.offsetWidth;
+      updateSliderState(typeInput.value, false);
+    });
+    
+    window.addEventListener('DOMContentLoaded', () => {
+      toggleSliderWidth = toggleSlider.offsetWidth;
+      sliderWidth = slider.offsetWidth;
+      updateSliderState('Pemasukan', false);
+    });
 
-    toggleOptions.forEach((opt, index) => {
+    toggleSlider.addEventListener('mousedown', (e) => {
+        if (e.target !== slider) return;
+        isDragging = true;
+        dragStartX = e.clientX;
+        sliderOffset = slider.offsetLeft;
+        document.body.style.userSelect = 'none';
+    });
+    toggleSlider.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        dragStartX = e.touches[0].clientX;
+        sliderOffset = slider.offsetLeft;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const currentX = e.clientX;
+        const deltaX = currentX - dragStartX;
+        let newLeft = sliderOffset + deltaX;
+
+        const maxLeft = toggleSliderWidth - sliderWidth - (0.25 * 16);
+        newLeft = Math.max(0.25 * 16, Math.min(newLeft, maxLeft));
+        slider.style.left = `${newLeft}px`;
+        
+        const center = toggleSliderWidth / 2;
+        const newType = (newLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
+        if (typeInput.value !== newType) {
+          typeInput.value = newType;
+          updateCategories(newType);
+          updateSliderTextColors(newType);
+        }
+    });
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const currentX = e.touches[0].clientX;
+        const deltaX = currentX - dragStartX;
+        let newLeft = sliderOffset + deltaX;
+
+        const maxLeft = toggleSliderWidth - sliderWidth - (0.25 * 16);
+        newLeft = Math.max(0.25 * 16, Math.min(newLeft, maxLeft));
+        slider.style.left = `${newLeft}px`;
+
+        const center = toggleSliderWidth / 2;
+        const newType = (newLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
+        if (typeInput.value !== newType) {
+          typeInput.value = newType;
+          updateCategories(newType);
+          updateSliderTextColors(newType);
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        document.body.style.userSelect = 'auto';
+
+        const center = toggleSliderWidth / 2;
+        const finalType = (slider.offsetLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
+        updateSliderState(finalType, true);
+    });
+    document.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        const center = toggleSliderWidth / 2;
+        const finalType = (slider.offsetLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
+        updateSliderState(finalType, true);
+    });
+    
+    // Handle clicks on the text labels
+    toggleOptions.forEach((opt) => {
       opt.addEventListener('click', () => {
-        updateToggle(index);
+        updateSliderState(opt.dataset.type, true);
       });
     });
 
-    toggleSlider.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-    });
-
-    toggleSlider.addEventListener('touchend', (e) => {
-      const endX = e.changedTouches[0].clientX;
-      const swipeDistance = endX - startX;
-
-      // Only act on a significant horizontal swipe
-      if (Math.abs(swipeDistance) > swipeThreshold) {
-        if (swipeDistance > 0) {
-          // Swiped right -> select 'Pengeluaran'
-          updateToggle(1);
-        } else {
-          // Swiped left -> select 'Pemasukan'
-          updateToggle(0);
-        }
+    function updateSliderTextColors(type) {
+      if (type === 'Pemasukan') {
+        toggleOptions[0].style.color = '#ffffff';
+        toggleOptions[1].style.color = '#64748b';
+      } else {
+        toggleOptions[0].style.color = '#64748b';
+        toggleOptions[1].style.color = '#ffffff';
       }
-    });
-
-    function updateToggle(index) {
-        toggleOptions.forEach(o => o.classList.remove('active'));
-        toggleOptions[index].classList.add('active');
-        typeInput.value = toggleOptions[index].dataset.type;
-        slider.style.left = index === 0 ? '0.375rem' : 'calc(50% - 0.375rem)';
-        updateCategories(typeInput.value);
     }
     
-    updateCategories(typeInput.value);
+    function updateSliderState(type, animate = true) {
+      if (type === 'Pemasukan') {
+        typeInput.value = 'Pemasukan';
+        slider.style.left = `0.25rem`;
+      } else {
+        typeInput.value = 'Pengeluaran';
+        slider.style.left = `calc(50% + 0.25rem)`;
+      }
+      updateSliderTextColors(type);
+      updateCategories(type);
+    }
 
-    amountInput.addEventListener('click', () => {
+    updateSliderState('Pemasukan', false);
+
+    amountCard.addEventListener('click', () => {
       overlay.classList.remove('hidden');
       numpadModal.classList.remove('translate-y-full');
       numpadDisplay.textContent = formatNumber(amountInput.dataset.value || '');
@@ -275,7 +405,7 @@
           currentValue += btn.textContent;
         }
         amountInput.dataset.value = currentValue.replace(/^0+/, ''); // remove leading zeros
-        numpadDisplay.textContent = formatNumber(currentValue);
+        numpadDisplay.textContent = formatNumber(amountInput.dataset.value);
       });
     });
 
@@ -319,7 +449,7 @@
         e.target.reset();
         amountInput.value = '';
         amountInput.dataset.value = '';
-        updateToggle(0); // Reset to 'Pemasukan' after successful submit
+        updateSliderState('Pemasukan', true); // Reset to 'Pemasukan' after successful submit
       })
       .catch(err => {
         console.error("Error:", err);
