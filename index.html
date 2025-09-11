@@ -1,508 +1,297 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Dipta Finance Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="favicon.png" type="image/png">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dipta Finance Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9fafb;
+        }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f8fafc;
-      transition: background-color 0.3s ease;
-      touch-action: manipulation;
-    }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, .3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
 
-    .form-card {
-      background-color: #ffffff;
-      padding: 2rem 1.5rem;
-      border-radius: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    }
-    .input-group {
-      margin-top: 1.25rem;
-    }
-    .input-group label {
-      display: block;
-      margin-bottom: 0.35rem;
-      color: #64748b;
-      font-weight: 500;
-    }
-    .input-group input,
-    .input-group select,
-    .input-group textarea {
-      width: 100%;
-      background-color: #f1f5f9;
-      border-radius: 0.75rem;
-      padding: 1rem 1.25rem;
-      transition: all 0.2s ease;
-      border: 1px solid #e2e8f0;
-      color: #1a202c;
-      font-weight: 400;
-    }
-    .input-group input:focus,
-    .input-group select:focus,
-    .input-group textarea:focus {
-      outline: none;
-      border-color: #3b82f6;
-      background-color: #ffffff;
-    }
-    .input-group select {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 1rem center;
-      background-size: 1.25rem;
-    }
-    
-    .toggle-slider {
-      background-color: #f1f5f9;
-      border-radius: 9999px;
-      position: relative;
-      overflow: hidden;
-      touch-action: pan-y;
-      cursor: grab;
-    }
-    .toggle-slider .slider {
-      position: absolute;
-      top: 0.25rem;
-      bottom: 0.25rem;
-      left: 0.25rem;
-      width: calc(50% - 0.25rem);
-      background: linear-gradient(to right, #0ea5e9, #3b82f6);
-      border-radius: 9999px;
-      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      touch-action: none;
-    }
-    .toggle-slider span {
-      flex: 1;
-      text-align: center;
-      padding: 0.75rem 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: #64748b;
-      position: relative;
-      z-index: 10;
-      transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .toggle-slider span.active {
-      color: #ffffff;
-    }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-    .primary-btn {
-      background: linear-gradient(to right, #0ea5e9, #3b82f6);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .primary-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-    }
-    .primary-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
-    }
-    
-    .numpad-btn {
-      background-color: #f1f5f9;
-      color: #334155;
-      transition: all 0.2s ease;
-    }
-    .numpad-btn:hover {
-      background-color: #e2e8f0;
-      transform: translateY(-1px);
-    }
-    .numpad-btn:active {
-      transform: translateY(1px);
-    }
+        @keyframes popup {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
 
-    .toast {
-      animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 2.5s;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-      to { transform: translateX(-50%) translateY(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    .loading-spinner {
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top: 4px solid #fff;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: none;
-    }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-  <div class="w-full max-w-sm">
 
-    <!-- Header -->
-    <header class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-slate-900">Dipta Finance Tracker</h1>
-    </header>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="w-full max-w-sm px-4">
+        <h1 class="text-2xl font-bold text-center mb-6">👋 Hi, Dipta!</h1>
 
-    <div class="form-card">
-      <form id="financeForm">
-        
-        <!-- Tipe Transaksi (Toggle Slider) -->
-        <div class="mb-4">
-          <label class="block text-slate-700 font-semibold mb-2">Tipe Transaksi</label>
-          <div class="toggle-slider flex items-center justify-between p-1">
-            <div class="slider" id="slider"></div>
-            <span class="flex-1 text-center py-2 relative z-10 font-medium" data-type="Pemasukan">Pemasukan</span>
-            <span class="flex-1 text-center py-2 relative z-10 font-medium" data-type="Pengeluaran">Pengeluaran</span>
-          </div>
-          <input type="hidden" name="type" id="type" value="Pemasukan">
+        <!-- Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-md space-y-4">
+            <form id="financeForm" class="space-y-4">
+                <!-- Tipe Transaksi -->
+                <div>
+                    <label class="font-semibold">Tipe Transaksi</label>
+                    <div class="relative flex bg-gray-100 rounded-xl mt-2">
+                        <div class="absolute top-1 bottom-1 left-1 w-1/2 rounded-lg bg-blue-600 transition-all"
+                            id="slider"></div>
+                        <span data-type="Pemasukan"
+                            class="flex-1 text-center py-2 cursor-pointer font-medium text-gray-500 relative z-10 rounded-xl">Pemasukan</span>
+                        <span data-type="Pengeluaran"
+                            class="flex-1 text-center py-2 cursor-pointer font-medium text-gray-500 relative z-10 rounded-xl">Pengeluaran</span>
+                    </div>
+                    <input type="hidden" id="type" name="type" value="Pemasukan">
+                </div>
+
+                <!-- Tanggal -->
+                <div>
+                    <label class="font-semibold">Tanggal</label>
+                    <input type="date" id="date" name="date"
+                        class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                        required>
+                </div>
+
+                <!-- Kategori -->
+                <div>
+                    <label class="font-semibold">Kategori</label>
+                    <select id="category" name="category"
+                        class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-400"></select>
+                </div>
+
+                <!-- Jumlah -->
+                <div>
+                    <label class="font-semibold">Jumlah (Rp)</label>
+                    <div id="amountCard"
+                        class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 cursor-pointer hover:bg-gray-100 transition">
+                        <input type="text" id="amount" name="amount" placeholder="0" readonly
+                            class="w-full bg-transparent font-semibold">
+                    </div>
+                </div>
+
+                <!-- Metode -->
+                <div>
+                    <label class="font-semibold">Metode</label>
+                    <select id="method" name="method"
+                        class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-400">
+                        <option>BCA</option>
+                        <option>BRI</option>
+                        <option>BNI</option>
+                        <option>Jago</option>
+                        <option>ShopeePay</option>
+                        <option>GoPay</option>
+                        <option>Dana</option>
+                        <option>Cash</option>
+                    </select>
+                </div>
+
+                <!-- Deskripsi -->
+                <div>
+                    <label class="font-semibold">Deskripsi</label>
+                    <textarea id="desc" name="desc"
+                        class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-blue-400"></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button id="submitBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl w-full py-3 font-semibold flex justify-center items-center gap-2 shadow-sm transition">
+                    <span id="submitText">Simpan</span>
+                    <div id="loadingSpinner" class="loading-spinner"></div>
+                </button>
+            </form>
+
+            <!-- Link ke Spreadsheet -->
+            <div class="flex justify-center">
+                <a href="https://docs.google.com/spreadsheets/d/1Vb2uPIl2qAulpxUrsTDPIHVB6LxAB_wKJ1iqmwEemXM/edit?usp=sharing"
+                    target="_blank" class="p-2 rounded-xl hover:bg-green-100 transition">
+                    <!-- Icon Google Sheets -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"
+                        class="w-10 h-10 fill-green-600 hover:scale-110 transition-transform">
+                        <path
+                            d="M37 4H11C9.9 4 9 4.9 9 6V42C9 43.1 9.9 44 11 44H37C38.1 44 39 43.1 39 42V6C39 4.9 38.1 4 37 4Z" />
+                        <path fill="#34A853"
+                            d="M37 4H11C9.9 4 9 4.9 9 6V42C9 43.1 9.9 44 11 44H37C38.1 44 39 43.1 39 42V6C39 4.9 38.1 4 37 4Z" />
+                        <path fill="#FFF" d="M16 19H32V21H16V19ZM16 23H32V25H16V23ZM16 27H26V29H16V27Z" />
+                    </svg>
+                </a>
+            </div>
         </div>
-
-        <!-- Tanggal -->
-        <div class="input-group">
-          <label for="date">Tanggal</label>
-          <input type="date" id="date" name="date" class="bg-transparent outline-none text-slate-800 font-medium" placeholder=" " required>
-        </div>
-
-        <!-- Kategori -->
-        <div class="input-group">
-          <label for="category">Kategori</label>
-          <select id="category" name="category" class="bg-transparent outline-none text-slate-800 font-medium" required>
-            <!-- Opsi akan diisi oleh JavaScript -->
-          </select>
-        </div>
-
-        <!-- Jumlah -->
-        <div class="input-group cursor-pointer" id="amountCard">
-          <label for="amount">Jumlah (Rp)</label>
-          <input type="text" id="amount" name="amount" class="bg-transparent outline-none text-slate-800 font-semibold text-xl" placeholder="0" readonly required>
-        </div>
-
-        <!-- Metode -->
-        <div class="input-group">
-          <label for="method">Metode</label>
-          <select name="method" id="method" class="bg-transparent outline-none text-slate-800 font-medium">
-            <option value="BCA">BCA</option>
-            <option value="BRI">BRI</option>
-            <option value="BNI">BNI</option>
-            <option value="Jago">Jago</option>
-            <option value="ShopeePay">ShopeePay</option>
-            <option value="GoPay">GoPay</option>
-            <option value="Dana">Dana</option>
-            <option value="Cash">Cash</option>
-          </select>
-        </div>
-
-        <!-- Deskripsi -->
-        <div class="input-group">
-          <label for="desc">Deskripsi</label>
-          <textarea id="desc" name="desc" class="bg-transparent outline-none text-slate-800 font-medium min-h-[90px]" placeholder="Tambahkan catatan"></textarea>
-        </div>
-
-        <button class="primary-btn w-full text-white font-bold py-3 mt-6 rounded-xl shadow-md focus:outline-none flex justify-center items-center gap-2" type="submit" id="submitBtn">
-          <span id="submitText">Simpan Transaksi</span>
-          <div id="loadingSpinner" class="loading-spinner"></div>
-        </button>
-      </form>
     </div>
-  </div>
 
-  <!-- Numpad Modal -->
-  <div class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-50 flex items-end justify-center hidden" id="overlay">
-    <div class="bg-white p-6 rounded-t-3xl shadow-2xl w-full max-w-sm transform transition-transform duration-300 ease-out translate-y-full" id="numpadModal">
-      <div class="text-right text-3xl font-bold text-slate-800 tracking-wide mb-4 h-10" id="numpadDisplay">0</div>
-      <div class="grid grid-cols-3 gap-3">
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">1</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">2</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">3</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">4</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">5</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">6</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">7</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">8</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl">9</button>
-        <button type="button" class="numpad-btn text-2xl font-semibold py-4 rounded-xl col-span-2">0</button>
-        <button type="button" id="clearBtn" class="numpad-btn text-red-600 bg-red-100 text-2xl font-semibold py-4 rounded-xl"><i class="fas fa-backspace"></i></button>
-      </div>
-      <div class="flex gap-3 mt-6">
-        <button type="button" id="closeModal" class="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl hover:bg-slate-300 transition-colors duration-200">Tutup</button>
-        <button type="button" id="okBtn" class="flex-1 primary-btn text-white font-bold py-3 rounded-xl">OK</button>
-      </div>
+    <!-- Modal Numpad -->
+    <div id="overlay" class="hidden fixed inset-0 bg-black/40 flex items-end justify-center">
+        <div id="numpadModal"
+            class="bg-white w-full max-w-sm p-6 rounded-t-2xl transform transition-transform rounded-xl">
+            <div id="numpadDisplay" class="text-right text-2xl font-bold mb-4">0</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">1</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">2</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">3</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">4</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">5</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">6</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">7</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">8</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100">9</button>
+                <button type="button"
+                    class="numpad-btn p-4 text-lg font-semibold bg-gray-50 rounded-xl hover:bg-gray-100 col-span-2">0</button>
+                <!-- Delete Button -->
+                <button type="button" id="clearBtn"
+                    class="p-4 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18 12 12 6 6M12 12l6-6M12 12l6 6" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button id="closeModal" type="button"
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 rounded-xl py-3 font-semibold">Tutup</button>
+                <button id="okBtn" type="button"
+                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold">OK</button>
+            </div>
+        </div>
     </div>
-  </div>
-  
-  <!-- Toast Message -->
-  <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-lg font-semibold text-sm transform-gpu transition-all duration-300 ease-in-out opacity-0 z-50">
-    <i class="fas fa-check-circle mr-2"></i> Data berhasil disimpan!
-  </div>
 
-  <script>
-    const amountCard = document.getElementById('amountCard');
-    const amountInput = document.getElementById('amount');
-    const numpadModal = document.getElementById('numpadModal');
-    const numpadButtons = document.querySelectorAll('.numpad-btn');
-    const clearBtn = document.getElementById('clearBtn');
-    const closeModal = document.getElementById('closeModal');
-    const okBtn = document.getElementById('okBtn');
-    const overlay = document.getElementById('overlay');
-    const toast = document.getElementById('toast');
-    const typeInput = document.getElementById('type');
-    const toggleSlider = document.querySelector('.toggle-slider');
-    const slider = document.getElementById('slider');
-    const toggleOptions = toggleSlider.querySelectorAll('span');
-    const categorySelect = document.getElementById('category');
-    const numpadDisplay = document.getElementById('numpadDisplay');
-    const financeForm = document.getElementById('financeForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const submitText = document.getElementById('submitText');
-    const loadingSpinner = document.getElementById('loadingSpinner');
+    <!-- Toast -->
+    <div id="toastBox"
+        class="bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg opacity-0 scale-90 transform transition fixed bottom-6 left-1/2 -translate-x-1/2">
+        ✔ Data tersimpan
+    </div>
 
-    const categories = {
-      Pemasukan: ["Gaji", "Freelance", "Investasi", "Lainnya"],
-      Pengeluaran: ["F&B", "Transportasi", "Housing", "Kesehatan", "Perawatan", "Hiburan", "Lifestyle", "Sosial", "Edukasi", "Tabungan", "Investasi", "Darurat", "Lainnya"]
-    };
+    <!-- Script -->
+    <script>
+        const els = {
+            slider: document.getElementById('slider'),
+            typeInput: document.getElementById('type'),
+            category: document.getElementById('category'),
+            amountCard: document.getElementById('amountCard'),
+            amount: document.getElementById('amount'),
+            overlay: document.getElementById('overlay'),
+            numpadDisplay: document.getElementById('numpadDisplay'),
+            clearBtn: document.getElementById('clearBtn'),
+            okBtn: document.getElementById('okBtn'),
+            closeModal: document.getElementById('closeModal'),
+            toast: document.getElementById('toastBox'),
+            form: document.getElementById('financeForm')
+        };
 
-    function updateCategories(type) {
-      categorySelect.innerHTML = '';
-      categories[type].forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat;
-        option.textContent = cat;
-        categorySelect.appendChild(option);
-      });
-    }
-    
-    function formatNumber(numStr) {
-        if (!numStr) return '0';
-        const num = parseInt(numStr.replace(/\D/g, ''), 10);
-        return num.toLocaleString('id-ID');
-    }
+        const categories = {
+            Pemasukan: ["Gaji", "Freelance", "Investasi", "Lainnya"],
+            Pengeluaran: ["F&B", "Transportasi", "Housing", "Kesehatan", "Hiburan", "Lifestyle", "Sosial", "Edukasi", "Tabungan", "Darurat", "Lainnya"]
+        };
 
-    // Toggle Slider Logic (for both mouse and touch)
-    let isDragging = false;
-    let dragStartX = 0;
-    let sliderOffset = 0;
-    let toggleSliderWidth = 0;
-    let sliderWidth = 0;
-    
-    window.addEventListener('resize', () => {
-      toggleSliderWidth = toggleSlider.offsetWidth;
-      sliderWidth = slider.offsetWidth;
-      updateSliderState(typeInput.value, false);
-    });
-    
-    window.addEventListener('DOMContentLoaded', () => {
-      toggleSliderWidth = toggleSlider.offsetWidth;
-      sliderWidth = slider.offsetWidth;
-      updateSliderState('Pemasukan', false);
-    });
-
-    toggleSlider.addEventListener('mousedown', (e) => {
-        if (e.target !== slider) return;
-        isDragging = true;
-        dragStartX = e.clientX;
-        sliderOffset = slider.offsetLeft;
-        document.body.style.userSelect = 'none';
-    });
-    toggleSlider.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        dragStartX = e.touches[0].clientX;
-        sliderOffset = slider.offsetLeft;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const currentX = e.clientX;
-        const deltaX = currentX - dragStartX;
-        let newLeft = sliderOffset + deltaX;
-
-        const maxLeft = toggleSliderWidth - sliderWidth - (0.25 * 16);
-        newLeft = Math.max(0.25 * 16, Math.min(newLeft, maxLeft));
-        slider.style.left = `${newLeft}px`;
-        
-        const center = toggleSliderWidth / 2;
-        const newType = (newLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
-        if (typeInput.value !== newType) {
-          typeInput.value = newType;
-          updateCategories(newType);
-          updateSliderTextColors(newType);
+        function updateCategories(type) {
+            els.category.innerHTML = categories[type].map(c => `<option>${c}</option>`).join('');
         }
-    });
-    document.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const currentX = e.touches[0].clientX;
-        const deltaX = currentX - dragStartX;
-        let newLeft = sliderOffset + deltaX;
 
-        const maxLeft = toggleSliderWidth - sliderWidth - (0.25 * 16);
-        newLeft = Math.max(0.25 * 16, Math.min(newLeft, maxLeft));
-        slider.style.left = `${newLeft}px`;
-
-        const center = toggleSliderWidth / 2;
-        const newType = (newLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
-        if (typeInput.value !== newType) {
-          typeInput.value = newType;
-          updateCategories(newType);
-          updateSliderTextColors(newType);
+        function updateSlider(type) {
+            els.typeInput.value = type;
+            els.slider.style.left = type === "Pemasukan" ? "4px" : "calc(50% + 4px)";
+            document.querySelectorAll('[data-type]').forEach(s => {
+                s.classList.toggle('text-white', s.dataset.type === type);
+                s.classList.toggle('font-semibold', s.dataset.type === type);
+            });
+            updateCategories(type);
         }
-    });
 
-    document.addEventListener('mouseup', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        document.body.style.userSelect = 'auto';
+        updateSlider("Pemasukan");
 
-        const center = toggleSliderWidth / 2;
-        const finalType = (slider.offsetLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
-        updateSliderState(finalType, true);
-    });
-    document.addEventListener('touchend', () => {
-        if (!isDragging) return;
-        isDragging = false;
+        document.querySelector('.relative.flex').addEventListener('click', e => {
+            if (e.target.dataset.type) updateSlider(e.target.dataset.type);
+        });
 
-        const center = toggleSliderWidth / 2;
-        const finalType = (slider.offsetLeft + (sliderWidth / 2)) > center ? 'Pengeluaran' : 'Pemasukan';
-        updateSliderState(finalType, true);
-    });
-    
-    // Handle clicks on the text labels
-    toggleOptions.forEach((opt) => {
-      opt.addEventListener('click', () => {
-        updateSliderState(opt.dataset.type, true);
-      });
-    });
+        els.amountCard.addEventListener('click', () => {
+            els.overlay.classList.remove('hidden');
+            els.numpadDisplay.textContent = els.amount.dataset.value || "0";
+        });
 
-    function updateSliderTextColors(type) {
-      if (type === 'Pemasukan') {
-        toggleOptions[0].style.color = '#ffffff';
-        toggleOptions[1].style.color = '#64748b';
-      } else {
-        toggleOptions[0].style.color = '#64748b';
-        toggleOptions[1].style.color = '#ffffff';
-      }
-    }
-    
-    function updateSliderState(type, animate = true) {
-      if (type === 'Pemasukan') {
-        typeInput.value = 'Pemasukan';
-        slider.style.left = `0.25rem`;
-      } else {
-        typeInput.value = 'Pengeluaran';
-        slider.style.left = `calc(50% + 0.25rem)`;
-      }
-      updateSliderTextColors(type);
-      updateCategories(type);
-    }
+        document.querySelector('#numpadModal .grid').addEventListener('click', e => {
+            if (!e.target.closest('button')) return;
+            const btn = e.target.closest('button');
+            if (btn.id === "clearBtn") {
+                let v = els.amount.dataset.value || "";
+                els.amount.dataset.value = v.slice(0, -1);
+            } else {
+                let val = els.amount.dataset.value || "";
+                val += btn.textContent;
+                els.amount.dataset.value = val.replace(/^0+/, "");
+            }
+            els.numpadDisplay.textContent = Number(els.amount.dataset.value || 0).toLocaleString('id-ID');
+        });
 
-    updateSliderState('Pemasukan', false);
+        els.okBtn.addEventListener('click', () => {
+            els.amount.value = "Rp " + Number(els.amount.dataset.value || 0).toLocaleString('id-ID');
+            els.overlay.classList.add('hidden');
+        });
 
-    amountCard.addEventListener('click', () => {
-      overlay.classList.remove('hidden');
-      numpadModal.classList.remove('translate-y-full');
-      numpadDisplay.textContent = formatNumber(amountInput.dataset.value || '');
-    });
+        els.closeModal.addEventListener('click', () => els.overlay.classList.add('hidden'));
 
-    numpadButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Tambahkan efek getar (vibration)
-        if (navigator.vibrate) {
-            navigator.vibrate(50); // Getaran selama 50ms
+        function showToast(msg = "✔ Data tersimpan") {
+            els.toast.textContent = msg;
+            els.toast.classList.remove("opacity-0", "scale-90");
+            els.toast.style.animation = "popup 0.4s cubic-bezier(0.25, 1, 0.5, 1)";
+            setTimeout(() => {
+                els.toast.style.animation = "";
+                els.toast.classList.add("opacity-0", "scale-90");
+            }, 2000);
         }
-        
-        let currentValue = amountInput.dataset.value || '';
-        if (btn.textContent.match(/[0-9]/)) {
-          currentValue += btn.textContent;
-        }
-        amountInput.dataset.value = currentValue.replace(/^0+/, ''); // remove leading zeros
-        numpadDisplay.textContent = formatNumber(amountInput.dataset.value);
-      });
-    });
 
-    clearBtn.addEventListener('click', () => {
-      // Tambahkan efek getar (vibration)
-      if (navigator.vibrate) {
-          navigator.vibrate(50);
-      }
-      let currentValue = amountInput.dataset.value || '';
-      amountInput.dataset.value = currentValue.slice(0, -1);
-      numpadDisplay.textContent = formatNumber(amountInput.dataset.value);
-    });
+        els.form.addEventListener('submit', e => {
+            e.preventDefault();
 
-    okBtn.addEventListener('click', () => {
-      // Tambahkan efek getar (vibration)
-      if (navigator.vibrate) {
-          navigator.vibrate(100); // Getaran sedikit lebih panjang untuk konfirmasi
-      }
-      amountInput.value = 'Rp ' + formatNumber(amountInput.dataset.value);
-      overlay.classList.add('hidden');
-      numpadModal.classList.add('translate-y-full');
-    });
+            const formData = new FormData(e.target);
+            if (els.amount.dataset.value) formData.set("amount", els.amount.dataset.value);
 
-    closeModal.addEventListener('click', () => {
-      overlay.classList.add('hidden');
-      numpadModal.classList.add('translate-y-full');
-    });
+            e.target.reset();
+            els.amount.value = "";
+            els.amount.dataset.value = "";
 
-    financeForm.addEventListener('submit', function(e) {
-      e.preventDefault();
+            showToast("✔ Data tersimpan");
 
-      // Tampilkan status loading pada tombol
-      submitBtn.disabled = true;
-      submitText.textContent = 'Menyimpan...';
-      loadingSpinner.style.display = 'block';
-
-      const formData = new FormData(e.target);
-      const amountValue = amountInput.dataset.value;
-      if (amountValue) {
-        formData.set('amount', amountValue);
-      }
-
-      fetch("https://script.google.com/macros/s/AKfycbzAH1ygE-bSJMVnnPmEQGQygpO1gs4juPmC3OeUSouAXevWhAb2wdq66czKDdhCP9Xeug/exec", {
-        method: "POST",
-        body: new URLSearchParams(formData),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" }
-      })
-      .then(res => res.json())
-      .then(data => {
-        toast.classList.remove('opacity-0');
-        setTimeout(() => {
-          toast.classList.add('opacity-0');
-        }, 3000);
-        
-        e.target.reset();
-        amountInput.value = '';
-        amountInput.dataset.value = '';
-        updateSliderState('Pemasukan', true); // Reset to 'Pemasukan' after successful submit
-      })
-      .catch(err => {
-        console.error("Error:", err);
-      })
-      .finally(() => {
-        // Sembunyikan status loading pada tombol
-        submitBtn.disabled = false;
-        submitText.textContent = 'Simpan Transaksi';
-        loadingSpinner.style.display = 'none';
-      });
-    });
-
-  </script>
+            fetch("https://script.google.com/macros/s/AKfycbzAH1ygE-bSJMVnnPmEQGQygpO1gs4juPmC3OeUSouAXevWhAb2wdq66czKDdhCP9Xeug/exec", {
+                method: "POST",
+                body: new URLSearchParams(formData)
+            }).catch(() => {
+                showToast("❌ Gagal sinkron, coba lagi");
+            });
+        });
+    </script>
 </body>
+
 </html>
